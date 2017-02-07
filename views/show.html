@@ -1,0 +1,396 @@
+{{ template "inc/header.html" .}}
+</head>
+<body>
+    {{template "inc/menu.html" .}}
+
+    <form class ="form-inline" role="form" action="/" method="GET" style="padding:10px;">
+		<div class="form-group">
+			<label  for="name">状态</label>
+			<select  name="status" class="selectpicker product"  data-live-search="true">
+				<option value='-1'>全部</option>
+                <option value='0'>待完成</option>
+                <option value='5'>已放弃</option>
+                <option value='10'>已完成</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label  for="name">结束时间</label>
+            <input type='date' name="begin_date" />
+            <input type='date' name="end_date" />
+		</div>
+		<button type="submit" class="btn btn-default" >搜索</button>
+	</form>
+	<hr/>
+             
+	<button class="btn btn-primary" data-toggle="modal" data-target="#new_things">新建要做事情</button>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#chg_things">修改要做事情</button>
+	<button class="btn btn-primary" data-toggle="modal" data-target="#end_things">完成</button>
+	<button class="btn btn-primary" data-toggle="modal" data-target="#drop_things">放弃</button>
+    <table  class="table " data-body="body" id="body_table_list" id="body_table_list" >
+    	<thead>
+    		<tr>
+    			<th>状态</th>
+    			<th>要做的事情</th>
+    			<th>计划要截止时间</th>
+				<th>实际完成/放弃时间</th>
+    		</tr>
+    	</thead>
+		<tbody>
+			{{range $k,$v := .result }}
+ 
+		 
+				{{if eq $v.Status  0}}
+					<tr rec_id="{{$v.RecID}}">
+					<td>{{$v.Status | to_do_status}}</td>
+					<td>{{$v.ToDoThings}}</td>
+					<td>{{$v.ExpectEndDate}}</td>
+					<td>{{$v.EndDate}}</td>
+					</tr>
+				{{else if eq $v.Status  5}}
+					<tr class="danger" rec_id="{{$v.RecID}}">
+						 
+						<td>{{$v.Status | to_do_status}}</td>
+						<td>{{$v.ToDoThings}}</td>
+						<td>{{$v.ExpectEndDate}}</td>
+						<td>{{$v.EndDate}}</td>
+					</tr>
+				{{else}}
+					<tr class="success" rec_id="{{$v.RecID}}">
+						<td>{{$v.Status | to_do_status}}</td>
+						<td>{{$v.ToDoThings}}</td>
+						<td>{{$v.ExpectEndDate}}</td>
+						<td>{{$v.EndDate}}</td>
+						
+					</tr>
+				{{end}} 
+			{{end}} 
+    	</tbody>
+    </table>
+
+ <div class="modal fade" id="new_things" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true" >
+  	 <div class="modal-dialog"  style="display:inline-block; width:auto;height:auto;">
+     	 <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">
+            	新建本年需要做的事
+            </h4>
+         </div>
+         <div class="modal-body"  >
+        
+          	   <form id="new_things_form" >
+					<label>预计截止时间</label>
+					<input type="date" name="expect_end_date"> <br/><br/>
+					<label>事情内容:</label>
+					<textarea name="to_do_things" style="width:300px;height:150px"></textarea>
+		 		 
+			  </form>
+   		</div>
+	    <div class="modal-footer">
+	        <button type="button" class="btn btn-default" 
+	           data-dismiss="modal">关闭
+	        </button>
+	         <button type="button" class="btn btn-primary" id="btn_new_things">
+	           新建
+	        </button>
+	         
+	    </div>
+	 </div>
+   </div>
+   </div>
+
+
+<div class="modal fade" id="chg_things" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true"  >
+  	 <div class="modal-dialog"  style="display:inline-block; width:auto;height:auto;">
+     	 <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">
+            修改
+            </h4>
+         </div>
+         <div class="modal-body"  >
+        
+          	   <form id="chg_things_form" >
+					 <input type="hidden" name="rec_id" />
+					<label>预计截止时间</label>
+					<input type="date" name="expect_end_date"> <br/><br/>
+					<label>事情内容:</label>
+					<textarea name="to_do_things" style="width:300px;height:150px"></textarea>
+		 		 
+			  </form>
+   		</div>
+	    <div class="modal-footer">
+	        <button type="button" class="btn btn-default" 
+	           data-dismiss="modal">关闭
+	        </button>
+	         <button type="button" class="btn btn-primary" id="chg_new_things">
+	           修改
+	        </button>
+	         
+	    </div>
+	 </div>
+   </div>
+   </div>
+
+
+<div class="modal fade" id="end_things" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true"  >
+  	 <div class="modal-dialog"  style="display:inline-block; width:auto;height:auto;">
+     	 <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">
+            完成
+            </h4>
+         </div>
+         <div class="modal-body"  >
+        
+          	   <form id="end_things_form" >
+					 <input type="hidden" name="rec_id" />
+					<label>完成时间</label>
+					<input type="date" name="end_date"> <br/><br/>
+					
+		 		 
+			  </form>
+   		</div>
+	    <div class="modal-footer">
+	        <button type="button" class="btn btn-default" 
+	           data-dismiss="modal">关闭
+	        </button>
+	         <button type="button" class="btn btn-primary" id="end_new_things">
+	           完成
+	        </button>
+	         
+	    </div>
+	 </div>
+   </div>
+   </div>
+
+   <div class="modal fade" id="drop_things" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true"  >
+  	 <div class="modal-dialog"  style="display:inline-block; width:auto;height:auto;">
+     	 <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">
+            放弃
+            </h4>
+         </div>
+         <div class="modal-body"  >
+        
+          	   <form id="drop_things_form" >
+					 <input type="hidden" name="rec_id" />
+					<label>放弃</label>
+					<input type="date" name="end_date"> <br/><br/>
+					
+		 		 
+			  </form>
+   		</div>
+	    <div class="modal-footer">
+	        <button type="button" class="btn btn-default" 
+	           data-dismiss="modal">关闭
+	        </button>
+	         <button type="button" class="btn btn-primary" id="drop_new_things">
+	           放弃
+	        </button>
+	         
+	    </div>
+	 </div>
+   </div>
+   </div>
+   <script type="text/javascript">
+   	$(function(){
+		  $("#btn_new_things").click(function(){
+			var to_do_things = $("#new_things_form").find("[name='to_do_things']").val();
+			var expect_end_date = $("#new_things_form").find("[name='expect_end_date']").val();
+			  if(to_do_things ==""){
+				  alert("事情内容不能为空");
+				  return false;
+			  }
+			  if(expect_end_date == ""){
+				  alert("事情应该有截止日期才好奥");
+				  return false;
+			  }
+			  var data = $("#new_things_form").serialize();
+		 
+			  var url ="/show/add";
+			  $.ajax({
+	     		url:url,
+	     		dataType:'json',
+	     		type:'POST',
+				data:data,
+	     		async:false,  
+	     		success:function(result){
+					alert(result.message);
+					if(result.code == 0){
+						document.location.reload();
+					} 
+				 }	 
+			  });
+			  
+	 }); 
+
+
+
+	 $('#chg_things').on('show.bs.modal', function () {
+
+		var rec_id= $("#body_table_list").find(".tr_selected").attr("rec_id");
+		if(rec_id =="" || rec_id ==null)
+		{
+			alert("请选中要修改列表");
+			return false;
+		}
+	 
+		var url = "/show/get"
+		// go 只能导出大写字符。。。和数据库字符不一致不能直接匹配
+		 $.ajax({
+			url:url,
+			dataType:'json',
+			type:'POST',
+			data:{rec_id:rec_id},
+			async:false,  
+			success:function(result){
+				 
+				$("#chg_things_form").find("[name='rec_id']").val(result.RecID);
+				$("#chg_things_form").find("[name='expect_end_date']").val(result.ExpectEndDate);
+				$("#chg_things_form").find("[name='to_do_things']").val(result.ToDoThings);
+			}	 
+		});
+
+	 });
+
+
+	 $('#end_things').on('show.bs.modal', function () {
+
+		var rec_id= $("#body_table_list").find(".tr_selected").attr("rec_id");
+		if(rec_id =="" || rec_id ==null)
+		{
+			alert("请选中要修改列表");
+			return false;
+		}
+	 
+		var url = "/show/get"
+		// go 只能导出大写字符。。。和数据库字符不一致不能直接匹配
+		 $.ajax({
+			url:url,
+			dataType:'json',
+			type:'POST',
+			data:{rec_id:rec_id},
+			async:false,  
+			success:function(result){
+				 
+				$("#end_things_form").find("[name='rec_id']").val(result.RecID);
+			}	 
+		});
+
+	 });
+
+	  $('#drop_things').on('show.bs.modal', function () {
+
+		var rec_id= $("#body_table_list").find(".tr_selected").attr("rec_id");
+		if(rec_id =="" || rec_id ==null)
+		{
+			alert("请选中要放弃列表");
+			return false;
+		}
+	 
+		var url = "/show/get"
+		// go 只能导出大写字符。。。和数据库字符不一致不能直接匹配
+		 $.ajax({
+			url:url,
+			dataType:'json',
+			type:'POST',
+			data:{rec_id:rec_id},
+			async:false,  
+			success:function(result){
+				 
+				$("#drop_things_form").find("[name='rec_id']").val(result.RecID);
+			}	 
+		});
+
+	 });
+	 $("#chg_new_things").click(function(){
+		
+		var url ="/show/chg";
+		var expect_end_date = $("#chg_things_form").find("[name='expect_end_date']").val();
+		var to_do_things = $("#chg_things_form").find("[name='to_do_things']").val();
+		var data = $("#chg_things_form").serialize();
+		if("" == expect_end_date){
+			alert("预计截至日期不能为空");
+			return false;
+		}
+		if("" == to_do_things){
+			alert("事情内容不能为空");
+			return false;
+		}
+		
+		$.ajax({
+			url:url,
+			dataType:'json',
+			type:'POST',
+			data:data,
+			async:false,  
+			success:function(result){
+				alert(result.message);
+				if(result.code == 0){
+					document.location.reload();
+				} 
+			}	 
+		});
+		
+			
+	 });
+	 $("#end_new_things").click(function(){
+		 var url ="/show/end";
+		var end_date = $("#end_things_form").find("[name='end_date']").val();
+		 
+		var data = $("#end_things_form").serialize();
+		 
+		if("" == end_date){
+			alert("完成时间不能为空");
+			return false;
+		}
+		
+		$.ajax({
+			url:url,
+			dataType:'json',
+			type:'POST',
+			data:data,
+			async:false,  
+			success:function(result){
+				alert(result.message);
+				if(result.code == 0){
+					document.location.reload();
+				} 
+			}	 
+		});
+	 });
+
+	  $("#drop_new_things").click(function(){
+		 var url ="/show/drop";
+		var end_date = $("#drop_things_form").find("[name='end_date']").val();
+		 
+		var data = $("#drop_things_form").serialize();
+		 
+		if("" == end_date){
+			alert("放弃时间不能为空");
+			return false;
+		}
+		
+		$.ajax({
+			url:url,
+			dataType:'json',
+			type:'POST',
+			data:data,
+			async:false,  
+			success:function(result){
+				alert(result.message);
+				if(result.code == 0){
+					document.location.reload();
+				} 
+			}	 
+		});
+	 });
+	});
+   </script>
+</body>
+</html>
